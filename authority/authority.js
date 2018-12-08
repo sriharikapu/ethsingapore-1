@@ -12,9 +12,6 @@ module.exports = (topic, root, endpoint) => {
 class Authority extends EventEmitter {
 
     constructor (topic, root, endpoints) {
-        console.log(endpoints.begin)
-        console.log(endpoints.end)
-        console.log(endpoints.endpoint)
         super()
         // Start IPFS node with experimental pubsub on
         this._node = new IPFS({
@@ -124,19 +121,47 @@ class Authority extends EventEmitter {
     }
 
     _addBlock (blockNum, callback) {
-        console.log(blockNum)
-        console.log(this._toHex(blockNum))
         let endpoint = this._begin + this._toHex(blockNum) + this._end
-        console.log(endpoint)
         request(endpoint, (err, resp, body) => {
            if (err) {
                callback(err)
            } else {
-               this._node.dag.put(JSON.parse(body), KECCAK_JSON, (e, cid) => {
-                   callback(e, JSON.parse(body), cid)
+               let body_json = JSON.parse(body)
+               this._addTx(body_json.result.transactions, (error, tx_cid) => {
+                   let object = {
+                     jsonrpc: body_json.jsonrpc, 
+                     id: body_json.id,
+                     difficulty: body_json.result.difficulty, 
+                     extraData: body_json.result.extraData,
+                     gasLimit: body_json.result.gasLimit,
+                     gasUsed: body_json.result.gasUsed,
+                     hash: body_json.result.hash,
+                     logsBloom: body_json.result.logsBloom,
+                     miner: body_json.result.miner,
+                     mixHash: body_json.result.mixHash,
+                     nonce: body_json.result.nonce,
+                     number: body_json.result.number,
+                     parentHash: body_json.result.parentHash,
+                     receiptsRoot: body_json.result.receiptsRoot,
+                     sha3Uncles: body_json.result.sha3Uncles,
+                     size: body_json.result.size,
+                     stateRoot: body_json.result.stateRoot,
+                     timestamp: body_json.result.timestamp,
+                     totalDifficulty: body_json.result.totalDifficulty,
+                     transactions: tx_cid.toString()
+                   }
+                   this._node.dag.put(object, KECCAK_JSON, (e, cid) => {
+                       callback(e, object, cid)
+                   })
                })
            }
         })
+    }
+
+    _addTx (tx, callback) {
+       this._node.dag.put(tx, KECCAK_JSON, (e, cid) => {
+           callback(e, cid)
+       })
     }
 
     _toNibble(val) {
