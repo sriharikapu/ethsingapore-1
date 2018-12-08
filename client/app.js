@@ -26,10 +26,12 @@ function main(api) {
   });
 
   app.get('/getBlockNumber', function(req, res){
-    api.getBlockNumber(store.get('hash'), (error, number) =>{
+    //api.getBlockNumber(store.get('hash'), (error, number) =>{
+    api.getBlockNumber("zdpuB1VLxHwLRDMWtpkFAfdagPATZxSz3Pt7DkWPnaacvwwYQ", (error, number) =>{
       if(error){
         console.log(error)
       } else{
+  
         res.json(number)
       }
     })

@@ -18,15 +18,17 @@
     </div>
 
   <script>
-    setInterval(getApi(), 20)
+    getApi()
+    var myTimer = setInterval(getApi, 20000)
 
-    function getApi(){
+    function getApi() {
       fetch('http://localhost:3000/getBlockNumber').then(function(response) {
           return response.json();
         })
         .then(function(myJson) {
           document.getElementById("display").innerHTML = "Block Number: " + myJson
-        })
+          console.log("Updated")
+      })
     }
   </script>
 </body>
