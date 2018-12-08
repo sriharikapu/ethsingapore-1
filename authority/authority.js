@@ -1,4 +1,6 @@
-const request = require('request')
+const requests = require('request')
+const util = require('util')
+const request = util.promisify(requests)
 const Room = require('ipfs-pubsub-room')
 const IPFS = require('ipfs')
 const EventEmitter = require('events')
@@ -12,9 +14,9 @@ module.exports = (topic, root, endpoint) => {
 class Authority extends EventEmitter {
 
     constructor (topic, root, endpoints) {
-        console.log(endpoints.begin)
-        console.log(endpoints.end)
-        console.log(endpoints.endpoint)
+        // console.log(endpoints.begin)
+        // console.log(endpoints.end)
+        // console.log(endpoints.endpoint)
         super()
         // Start IPFS node with experimental pubsub on
         this._node = new IPFS({
@@ -34,13 +36,12 @@ class Authority extends EventEmitter {
         this._endpoint = endpoints.endpoint
         this._begin = endpoints.begin
         this._end = endpoints.end
-        this._start(root)
+        // this._start(root)
     }
 
-    _start (root) {
-        // When the ipfs node is ready, create/connect to the PS room
-        this._node.on('ready', () => {
-
+    async start() {
+        // console.log('start')
+        this._node.on('ready', async () => {
             this.emit('node ready')
 
             this._room = Room(this._node, this._topic)
@@ -58,85 +59,99 @@ class Authority extends EventEmitter {
                 this.emit('error', err)
             })
 
-            this._initialize(root, (err, res) => {
-                if (err) {
-                    this.emit('error', err)
-                } else {
-                    this._curFile = res.value
-                    this.emit('ready')
-                    setInterval(this._update.bind(this), 1000)
-                }
-            })
-        })
-    }
-
-    _initialize (root, callback) {
-        this._node.dag.get(root, function (err, res) {
-            callback(err, res)
-        })
-    }
-
-    _update () {
-        // console.log('updating')
-        request(this._endpoint, (err, resp, body) => {
-            if (err) {
-                this.emit('error', err)
-            } else {
-                var blockNum = parseInt(JSON.parse(body).result, 16)
-                // console.log(blockNum)
-                // console.log('cur: ' + this.lastBlock())
-                if (blockNum > this.lastBlock()) {
-                    this._addBlock(blockNum, (block_err, block_cur, block_cid) => {
-                        if (block_err) {
-                            this.emit('error', block_err)
-                        } else {
-                            this.emit('block added', block_cur)
-                            this._addFile(blockNum, block_cid.toString(), (err, cur, cid) => {
-                                if (err) {
-                                    this.emit('error', err)
-                                } else {
-                                    this._root = cid.toString()
-                                    this._curFile = cur
-                                    this.emit('file added', cur, cid)
-                                }
-                            })
-                        }
-                    })
-                }
+            var res = await this._initialize(this._root)
+            if (!res.err) {
+                // console.log('interval')
+                setInterval(this._update.bind(this), 1000)
             }
         })
     }
 
-    _addFile (blockNum, block_cid, callback) {
+    async _initialize (root) {
+        // console.log('initialize')
+        var res = await this._node.dag.get(root)
+        if (res.err) {
+            this.emit('error', res.err)
+        } else {
+            this._curFile = res.value
+            this.emit('ready')
+        }
+        return res
+    }
+
+    async _update () {
+        if (this._isUpdating) {
+            return
+        }
+        this._isUpdating = true
+        // console.log('updating')
+        
+        var blockNum = await request(this._endpoint)
+        if (blockNum.err) {
+            this.emit('error', blockNum.err)
+            this._isUpdating = false
+            return
+        }
+
+        blockNum = parseInt(JSON.parse(blockNum.body).result, 16)
+        if (blockNum <= this.lastBlock()) {
+            this._isUpdating = false
+            return
+        }
+
+        var blockCid = await this._addBlock(blockNum)
+        if (blockCid.err) {
+            this.emit('error', blockCid.err)
+            this._isUpdating = false
+            return
+        }
+        blockCid = blockCid.toString()
+        
+        var fileCid = await this._addFile(blockNum, blockCid)
+        if (fileCid.err) {
+            this.emit('error', fileCid.err)
+            this._isUpdating = false
+            return
+        }
+        this._isUpdating = false
+    }
+
+    async _addBlock (blockNum) {
+        console.log('Adding block')
+        let endpoint = this._begin + this._toHex(blockNum) + this._end
+        var response = await request(endpoint)
+        if (response.err) {
+            return response
+        }
+        
+        var body = JSON.parse(response.body)
+        var blockCid = await this._node.dag.put(body, KECCAK_JSON)
+        if (!blockCid.err) {
+            this.emit('block added', body)
+        }
+
+        return blockCid
+    }
+
+    async _addFile (blockNum, blockCid) {
         console.log('Adding file: ' + blockNum)
         var cur = this._curFile
         cur.latest = blockNum
         if (cur.blocks.length == 256) {
             cur.last = this._root
-            cur.blocks = [ block_cid ]
+            cur.blocks = [blockCid]
         } else {
-            console.log(this._root)
-            cur.blocks.push(block_cid)
+            cur.blocks.push(blockCid)
         }
-        this._node.dag.put(cur, KECCAK_JSON, function (err, cid) {
-            callback(err, cur, cid)
-        })
-    }
 
-    _addBlock (blockNum, callback) {
-        console.log(blockNum)
-        console.log(this._toHex(blockNum))
-        let endpoint = this._begin + this._toHex(blockNum) + this._end
-        console.log(endpoint)
-        request(endpoint, (err, resp, body) => {
-           if (err) {
-               callback(err)
-           } else {
-               this._node.dag.put(JSON.parse(body), KECCAK_JSON, (e, cid) => {
-                   callback(e, JSON.parse(body), cid)
-               })
-           }
-        })
+        var fileCid = await this._node.dag.put(cur, KECCAK_JSON)
+        if (!fileCid.err) {
+            this._curFile = cur
+            this._root = fileCid.toString()
+            this.emit('file added', cur, fileCid)
+        }
+
+        return fileCid
     }
 
     _toNibble(val) {
