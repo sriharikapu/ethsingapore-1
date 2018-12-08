@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/wadeAlexC/ethsingapore/issues"
   },
-  "homepage": "https://github.com/wadeAlexC/ethsingapore#readme"
+  "homepage": "https://github.com/wadeAlexC/ethsingapore#readme",
+  "dependencies": {
+    "ipfs": "^0.33.1"
+  }
 }
