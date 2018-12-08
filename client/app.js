@@ -27,7 +27,7 @@ function main(api) {
 
   app.get('/getBlockNumber', function(req, res){
     //api.getBlockNumber(store.get('hash'), (error, number) =>{
-    api.getBlockNumber("zdpuB1VLxHwLRDMWtpkFAfdagPATZxSz3Pt7DkWPnaacvwwYQ", (error, number) =>{
+    api.getBlockNumber("zdpuB1tmv8KF6We446PW2fHccQipc7GHKuSgPfHEjuqgPxEBu", (error, number) =>{
       if(error){
         console.log(error)
       } else{
@@ -71,7 +71,7 @@ function main(api) {
   app.get('/gasPrice', function(req, res){
     api.getGasPrice().then((error, price) =>{
       if(error){
-        consol.log(error)
+        console.log(error)
       } else{
         res.send(price)
       }
