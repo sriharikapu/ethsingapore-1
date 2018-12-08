@@ -31,7 +31,7 @@ function main(api) {
       if(error){
         console.log(error)
       } else{
-  
+
         res.json(number)
       }
     })
@@ -45,6 +45,37 @@ function main(api) {
     var hash = api.getRootHash(store.get("topic"))
     res.send(hash)
     store.set("hash", hash)
+  })
+
+  app.get('/getBlockByNumber', function(req, res){
+    api.getBlockByNumber(req.query.number).then( (error, block) =>{
+      if(error){
+        console.log(error)
+      } else{
+        res.send(block)
+      }
+    })
+  })
+
+
+  app.get('/getBlockTransactionCountByNumber', function(req, res){
+    api.getBlockTransactionCountByNumber(req.query.hash).then((error, count) => {
+      if(error){
+        console.log(error)
+      } else{
+        res.send(count)
+      }
+    })
+  })
+
+  app.get('/gasPrice', function(req, res){
+    api.getGasPrice().then((error, price) =>{
+      if(error){
+        consol.log(error)
+      } else{
+        res.send(price)
+      }
+    })
   })
 
   app.post('/changeTopic', function(req, res){
