@@ -45,12 +45,16 @@ function main(api) {
     store.set("hash", hash)
   })
 
+  app.post('/changeAuthority', function (req, res) {
+    api.changeAuthority(req.query.authority) 
+  })
+
   app.post('/changeTopic', function(req, res){
    api.changeTopic(req.query.topic, error => {
      if (error) {
        console.log(error)
      } else {
-        store.set("topic",req.query.topic)
+        store.set("topic", req.query.topic)
      }
    })
   })
