@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/wadeAlexC/ethsingapore#readme",
   "dependencies": {
+    "async": "^2.6.1",
     "ipfs": "^0.33.1"
   }
 }
