@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample Site</title>
+
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <style>
+        body { padding-top:50px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="jumbotron">
+            <h1 id="display"></h1>
+        </div>
+    </div>
+
+  <script>
+    setInterval(getApi(), 20)
+
+    function getApi(){
+      fetch('http://localhost:3000/getBlockNumber').then(function(response) {
+          return response.json();
+        })
+        .then(function(myJson) {
+          document.getElementById("display").innerHTML = "Block Number: " + myJson
+        })
+    }
+  </script>
+</body>
+</html>
