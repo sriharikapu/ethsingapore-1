@@ -9,11 +9,11 @@ lib((error, api) => {
     console.log(error)
     process.exit()
   } else{
-     main();
+     main(api);
   }
 })
 
-function main(){
+function main(api) {
   const store = new Store({ path: 'config.json' });
   store.set("hash", process.argv[2])
   store.set("topic", process.argv[3])
@@ -26,7 +26,7 @@ function main(){
   });
 
   app.get('/getBlockNumber', function(req, res){
-    api.getBlockNumber(store.get("hash"), (error, number) =>{
+    api.getBlockNumber(store.get('hash'), (error, number) =>{
       if(error){
         console.log(error)
       } else{
