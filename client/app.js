@@ -26,12 +26,11 @@ function main(api) {
   });
 
   app.get('/getBlockNumber', function(req, res){
-    //api.getBlockNumber(store.get('hash'), (error, number) =>{
-    api.getBlockNumber("zdpuB1tmv8KF6We446PW2fHccQipc7GHKuSgPfHEjuqgPxEBu", (error, number) =>{
+    api.getBlockNumber(store.get('hash'), (error, number) => {
+    //api.getBlockNumber("zdpuB1tmv8KF6We446PW2fHccQipc7GHKuSgPfHEjuqgPxEBu", (error, number) =>{
       if(error){
         console.log(error)
       } else{
-
         res.json(number)
       }
     })
@@ -48,7 +47,7 @@ function main(api) {
   })
 
   app.get('/getBlockByNumber', function(req, res){
-    api.getBlockByNumber(req.query.number).then( (error, block) =>{
+    api.getBlockByNumber(store.get("hash") , req.query.number, (error, block) => {
       if(error){
         console.log(error)
       } else{
@@ -59,7 +58,7 @@ function main(api) {
 
 
   app.get('/getBlockTransactionCountByNumber', function(req, res){
-    api.getBlockTransactionCountByNumber(req.query.hash).then((error, count) => {
+    api.getBlockTransactionCountByNumber(store.get("hash"), req.query.number, (error, count) => {
       if(error){
         console.log(error)
       } else{
@@ -69,7 +68,7 @@ function main(api) {
   })
 
   app.get('/gasPrice', function(req, res){
-    api.getGasPrice().then((error, price) =>{
+    api.getGasPrice(store.get("hash"), (error, price) =>{
       if(error){
         console.log(error)
       } else{

@@ -15,8 +15,8 @@
         <div class="jumbotron">
             <h1 id="numb"></h1>
             <h1 id="blockHash"></h1>
-            <p id= "blockData"> </p>
         </div>
+        <p id= "blockData"> </p>
     </div>
 
   <script>
@@ -36,7 +36,7 @@
     function addHash(number) {
       fetch('http://localhost:3000/getBlockByNumber?number='+number).then(function(response){
         return response.json();
-      }).then(function (myJson) => {
+      }).then(function (myJson) {
         document.getElementById("blockHash").innerHTML = "Block Hash: " + myJson.blockhash
         document.getElementById("blockData").innerHTML = "Block Data: " + myJson.stringify()
         console.log("Block Added")
