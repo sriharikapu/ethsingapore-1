@@ -14,9 +14,6 @@ module.exports = (topic, root, endpoint) => {
 class Authority extends EventEmitter {
 
     constructor (topic, root, endpoints) {
-        // console.log(endpoints.begin)
-        // console.log(endpoints.end)
-        // console.log(endpoints.endpoint)
         super()
         // Start IPFS node with experimental pubsub on
         this._node = new IPFS({
@@ -36,7 +33,6 @@ class Authority extends EventEmitter {
         this._endpoint = endpoints.endpoint
         this._begin = endpoints.begin
         this._end = endpoints.end
-        // this._start(root)
     }
 
     async start() {
@@ -125,9 +121,36 @@ class Authority extends EventEmitter {
         }
         
         var body = JSON.parse(response.body)
-        var blockCid = await this._node.dag.put(body, KECCAK_JSON)
-        if (!blockCid.err) {
+        var txCid = await this._node.dag.put(body.result.transactions, KECCAK_JSON)
+        if (!txCid.err) {
             this.emit('block added', body)
+        }
+      
+        let obj = {
+            jsonrpc: body.jsonrpc, 
+            id: body.id,
+            difficulty: body.result.difficulty, 
+            extraData: body.result.extraData,
+            gasLimit: body.result.gasLimit,
+            gasUsed: body.result.gasUsed,
+            hash: body.result.hash,
+            logsBloom: body.result.logsBloom,
+            miner: body.result.miner,
+            mixHash: body.result.mixHash,
+            nonce: body.result.nonce,
+            number: body.result.number,
+            parentHash: body.result.parentHash,
+            receiptsRoot: body.result.receiptsRoot,
+            sha3Uncles: body.result.sha3Uncles,
+            size: body.result.size,
+            stateRoot: body.result.stateRoot,
+            timestamp: body.result.timestamp,
+            totalDifficulty: body.result.totalDifficulty,
+            transactions: txCid.toString()
+        }
+        var blockCid = await this._node.dag.put(obj, KECCAK_JSON)
+        if (blockCid.err) {
+            this.emit('error', blockCid.err) 
         }
 
         return blockCid
