@@ -1,0 +1,19 @@
+{
+  "name": "ethsingapore",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wadeAlexC/ethsingapore.git"
+  },
+  "author": "Alex Towle, Paul Vienhage, Alexander Wade",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wadeAlexC/ethsingapore/issues"
+  },
+  "homepage": "https://github.com/wadeAlexC/ethsingapore#readme"
+}
