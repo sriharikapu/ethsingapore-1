@@ -91,16 +91,16 @@ class Authority extends EventEmitter {
                             this.emit('error', block_err)
                         } else {
                             this.emit('block added', block_cur)
+                            this._addFile(blockNum, block_cid.toString(), (err, cur, cid) => {
+                                if (err) {
+                                    this.emit('error', err)
+                                } else {
+                                    this._root = cid.toString()
+                                    this._curFile = cur
+                                    this.emit('file added', cur, cid)
+                                }
+                            })
                         }
-                        this._addFile(blockNum, block_cid.toString(), (err, cur, cid) => {
-                            if (err) {
-                                this.emit('error', err)
-                            } else {
-                                this._root = cid.toString()
-                                this._curFile = cur
-                                this.emit('file added', cur, cid)
-                            }
-                        })
                     })
                 }
             }

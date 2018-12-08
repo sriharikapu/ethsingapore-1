@@ -7,7 +7,7 @@ program
     
 const BLOCKNUM_ENDPOINT = "https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=EEQ2VBSYD5D4UQM7GH5DBD1YQTNPWUD8R5"
 const BLOCK_ENDPOINT_BEGIN = "https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=" 
-const BLOCK_ENDPOINT_END = "boolean=true&apikey=EEQ2VBSYD5D4UQM7GH5DBD1YQTNPWUD8R5" 
+const BLOCK_ENDPOINT_END = "&boolean=true&apikey=EEQ2VBSYD5D4UQM7GH5DBD1YQTNPWUD8R5" 
 const DEFAULT_ROOT = "zdq6yJpRc1YzdMXgaa1irZaRThvqNd9vThiVqWqDBRuCMakPD"
 const DEFAULT_TOPIC = "ethsg"
 const INITIAL_ROOT = program.root ? program.root : DEFAULT_ROOT
