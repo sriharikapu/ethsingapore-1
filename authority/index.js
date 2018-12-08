@@ -22,7 +22,7 @@ authority.on('node ready', () => {
     })
 
     authority.on('ready', () => {
-        console.log('File system online: ' + authority.getFiles())
+        console.log('File system online: ' + JSON.stringify(authority.getFiles()))
     })
     
     authority.on('error', (err) => {
@@ -30,7 +30,7 @@ authority.on('node ready', () => {
     })
 
     authority.on('file added', (file, newRoot) => {
-        console.log('Added file: ' + file)
+        console.log('Added file: ' + JSON.stringify(file))
         console.log('New root: ' + newRoot)
     })
 

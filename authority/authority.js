@@ -55,7 +55,6 @@ class Authority extends EventEmitter {
                 if (err) {
                     this.emit('error', err)
                 } else {
-                    console.log(res.value)
                     this._curFile = res.value
                     this.emit('ready')
                     setInterval(this._update.bind(this), 1000)
@@ -71,20 +70,31 @@ class Authority extends EventEmitter {
     }
 
     _update () {
-        var blockNum = request(this._endpoint, function (err, resp, body) {
-            console.log('req made')
-            console.log(err)
-            console.log(resp)
-            console.log(body)
-            return parseInt(body.result, 16) // Return blocknum as integer
+        console.log('updating')
+        request(this._endpoint, (err, resp, body) => {
+            if (err) {
+                this.emit('error', err)
+            } else {
+                var blockNum = parseInt(JSON.parse(body).result, 16)
+                console.log(blockNum)
+                console.log('cur: ' + this.lastBlock())
+                if (blockNum > this.lastBlock()) {
+                    this._addFile(blockNum, (err, cur, cid) => {
+                        if (err) {
+                            this.emit('error', err)
+                        } else {
+                            this._root = cid.toString()
+                            this._curFile = cur
+                            this.emit('file added', cur, cid)
+                        }
+                    })
+                }
+            }
         })
-        // Add file
-        if (blockNum > this.lastBlock()) {
-            this._update(blockNum)
-        }
     }
 
-    _addFile (blockNum) {
+    _addFile (blockNum, callback) {
+        console.log('Adding file: ' + blockNum)
         var cur = this._curFile
         cur.latest = blockNum
         if (cur.blocks.length == 256) {
@@ -93,13 +103,7 @@ class Authority extends EventEmitter {
             cur.blocks.push(this._root)
         }
         this._node.dag.put(cur, KECCAK_JSON, function (err, cid) {
-            if (err) {
-                this.emit('error', err)
-            } else {
-                this._root = cid
-                this._curFile = cur
-                this.emit('file added', cur, cid)
-            }
+            callback(err, cur, cid)
         })
     }
 
