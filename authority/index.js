@@ -17,6 +17,8 @@ const INITIAL_TOPIC = program.topic ? program.topic : DEFAULT_TOPIC
 const Authority = require('./authority.js')
 const authority = Authority(INITIAL_TOPIC, INITIAL_ROOT, { begin: BLOCK_ENDPOINT_BEGIN, end: BLOCK_ENDPOINT_END, endpoint: BLOCKNUM_ENDPOINT })
 
+authority.start()
+
 authority.on('node ready', () => {
     
     authority.on('subscribed', () => {
@@ -37,7 +39,7 @@ authority.on('node ready', () => {
     })
 
     authority.on('block added', (file) => {
-        console.log('Added file: ' + JSON.stringify(file))
+        console.log('Added block')
     })
 
     authority.on('peer joined', (peer) => {
