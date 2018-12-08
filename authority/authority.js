@@ -70,14 +70,14 @@ class Authority extends EventEmitter {
     }
 
     _update () {
-        console.log('updating')
+        // console.log('updating')
         request(this._endpoint, (err, resp, body) => {
             if (err) {
                 this.emit('error', err)
             } else {
                 var blockNum = parseInt(JSON.parse(body).result, 16)
-                console.log(blockNum)
-                console.log('cur: ' + this.lastBlock())
+                // console.log(blockNum)
+                // console.log('cur: ' + this.lastBlock())
                 if (blockNum > this.lastBlock()) {
                     this._addFile(blockNum, (err, cur, cid) => {
                         if (err) {
