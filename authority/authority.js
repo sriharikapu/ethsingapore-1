@@ -32,6 +32,7 @@ class Authority extends EventEmitter {
         this._begin = endpoints.begin
         this._end = endpoints.end
         this._start(root)
+        this._lock = false
     }
 
     _start (root) {
@@ -74,34 +75,40 @@ class Authority extends EventEmitter {
     }
 
     _update () {
-        // console.log('updating')
-        request(this._endpoint, (err, resp, body) => {
-            if (err) {
-                this.emit('error', err)
-            } else {
-                var blockNum = parseInt(JSON.parse(body).result, 16)
-                // console.log(blockNum)
-                // console.log('cur: ' + this.lastBlock())
-                if (blockNum > this.lastBlock()) {
-                    this._addBlock(blockNum, (block_err, block_cur, block_cid) => {
-                        if (block_err) {
-                            this.emit('error', block_err)
-                        } else {
-                            this.emit('block added', block_cur)
-                            this._addFile(blockNum, block_cid.toString(), (err, cur, cid) => {
-                                if (err) {
-                                    this.emit('error', err)
-                                } else {
-                                    this._root = cid.toString()
-                                    this._curFile = cur
-                                    this.emit('file added', cur, cid)
-                                }
-                            })
-                        }
-                    })
+        if (!this._lock) {
+            this._lock = true
+            request(this._endpoint, (err, resp, body) => {
+                if (err) {
+                    this._lock = false
+                    this.emit('error', err)
+                } else {
+                    var blockNum = parseInt(JSON.parse(body).result, 16)
+                    if (blockNum > this.lastBlock()) {
+                        this._addBlock(blockNum, (block_err, block_cur, block_cid) => {
+                            if (block_err) {
+                                this._lock = false
+                                this.emit('error', block_err)
+                            } else {
+                                this.emit('block added', block_cur)
+                                this._addFile(blockNum, block_cid.toString(), (err, cur, cid) => {
+                                    if (err) {
+                                        this._lock = false
+                                        this.emit('error', err)
+                                    } else {
+                                        this._lock = false
+                                        this._root = cid.toString()
+                                        this._curFile = cur
+                                        this.emit('file added', cur, cid)
+                                    }
+                                })
+                            }
+                        })
+                    } else {
+                        this._lock = false
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 
     _addFile (blockNum, block_cid, callback) {
