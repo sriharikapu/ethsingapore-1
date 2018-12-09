@@ -11,23 +11,13 @@
 </head>
 <body>
 
-    <div class="container">
-        <div class="jumbotron">
-            <h1 id="display"></h1>
-        </div>
-    </div>
+    <form action="/changeRoot" method="POST">
+      <div class="form-group">
+        <label for="roothash"></label>
+        <input class="form-control" name="roothash" id="roothash" placeholder="zdq6yBgRFawfZhEkQ2RbUCxHJUp7eJtjA1QhJAZWFZ5PR7GYU">
+      </div>
+      <button type="submit" class="btn btn-primary">changeRoot</button>
+    </form>
 
-  <script>
-    setInterval(getApi(), 20)
-
-    function getApi(){
-      fetch('http://localhost:3000/getBlockNumber').then(function(response) {
-          return response.json();
-        })
-        .then(function(myJson) {
-          document.getElementById("display").innerHTML = "Block Number: " + myJson
-        })
-    }
-  </script>
 </body>
 </html>

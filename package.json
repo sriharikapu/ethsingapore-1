@@ -18,6 +18,7 @@
   "homepage": "https://github.com/wadeAlexC/ethsingapore#readme",
   "dependencies": {
     "async": "^2.6.1",
+    "body-parser": "^1.18.3",
     "commander": "^2.19.0",
     "data-store": "^3.1.0",
     "express": "^4.16.4",
