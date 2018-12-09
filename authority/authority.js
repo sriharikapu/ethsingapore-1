@@ -171,6 +171,7 @@ class Authority extends EventEmitter {
         if (!fileCid.err) {
             this._curFile = cur
             this._root = fileCid.toString()
+            this._room.broadcast(JSON.stringify(cur))
             this.emit('file added', cur, fileCid)
         }
 
