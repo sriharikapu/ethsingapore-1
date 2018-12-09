@@ -11,15 +11,15 @@
 </head>
 <body>
 
-    <div class="container">
-        <div class="jumbotron">
-            <h1 id="numb"></h1>
-            <h1 id="blockHash"></h1>
-        </div>
-        <p id= "blockData"> </p>
-    </div>
+    <form action="/changeRoot" method="POST">
+      <div class="form-group">
+        <label for="roothash"></label>
+        <input class="form-control" name="roothash" id="roothash" placeholder="zdq6yBgRFawfZhEkQ2RbUCxHJUp7eJtjA1QhJAZWFZ5PR7GYU">
+      </div>
+      <button type="submit" class="btn btn-primary">changeRoot</button>
+    </form>
 
-  <script>
+<!--  <script>
     getApi()
     var myTimer = setInterval(getApi, 20000)
 
@@ -28,20 +28,10 @@
           return response.json();
         })
         .then(function(myJson) {
-          document.getElementById("numb").innerHTML = "Block Number: " + myJson
+          document.getElementById("display").innerHTML = "Block Number: " + myJson
           console.log("Updated")
-          addHash(myJson)
       })
     }
-    function addHash(number) {
-      fetch('http://localhost:3000/getBlockByNumber?number='+number).then(function(response){
-        return response.json();
-      }).then(function (myJson) {
-        document.getElementById("blockHash").innerHTML = "Block Hash: " + myJson.blockhash
-        document.getElementById("blockData").innerHTML = "Block Data: " + myJson.stringify()
-        console.log("Block Added")
-      })
-    }
-  </script>
+  </script> -->
 </body>
 </html>
