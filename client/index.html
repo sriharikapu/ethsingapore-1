@@ -19,5 +19,19 @@
       <button type="submit" class="btn btn-primary">changeRoot</button>
     </form>
 
+<!--  <script>
+    getApi()
+    var myTimer = setInterval(getApi, 20000)
+
+    function getApi() {
+      fetch('http://localhost:3000/getBlockNumber').then(function(response) {
+          return response.json();
+        })
+        .then(function(myJson) {
+          document.getElementById("display").innerHTML = "Block Number: " + myJson
+          console.log("Updated")
+      })
+    }
+  </script> -->
 </body>
 </html>
