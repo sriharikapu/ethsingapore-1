@@ -19,15 +19,10 @@ class Authority extends EventEmitter {
         this._node = new IPFS({
             EXPERIMENTAL: {
                 pubsub: true
-            },
-            config: {
-                Addresses: {
-                    Swarm: [
-                        '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
-                    ]
-                }
             }
         })
+        // console.log(this._node)
+        // this._node.bootstrap.add('/ip4/203.118.42.165/tcp/64417/ipfs/QmaVygMJHKhh1BPZvorkLSZsLQ7vmRpYhCjJ5dakavt2Yo')
         this._root = root
         this._topic = topic
         this._endpoint = endpoints.endpoint
@@ -38,16 +33,19 @@ class Authority extends EventEmitter {
     async start() {
         // console.log('start')
         this._node.on('ready', async () => {
+            // console.log(await this._node.bootstrap.list())
             this.emit('node ready')
 
             this._room = Room(this._node, this._topic)
 
             this._room.on('subscribed', () => {
+                console.log('subbed')
                 this.emit('subscribed')
             })
             
             this._room.on('peer joined', (peer) => {
                 this.emit('peer joined', peer)
+                console.log('peer joined' + peer)
                 this._room.broadcast(this._root)
             })
 
